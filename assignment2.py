@@ -133,12 +133,10 @@ class Node:
         self.childen_freq = [0 for _ in range(27)]
         self.childen = [None for _ in range(27)]
         self.highest_child = None
-        self.end = False
         self.freq = 0
 class CatsTrie:
     def __init__(self, sentences):
         self.root_node = Node(" ")
-        # current_node = self.root_node
         for sentence in sentences: # "abc"
             current_node = self.root_node
             for i in range(len(sentence)): #'a'
@@ -149,7 +147,6 @@ class CatsTrie:
                     child_node.parent = current_node
 
                 if i == len(sentence)-1:
-                    current_node.childen[index].end = True
                     current_node.childen[index].freq += 1
                     current_node = current_node.childen[index]
                     if current_node.childen[0] == None:
@@ -171,9 +168,7 @@ class CatsTrie:
                         current_node.highest_child = current_node.childen[highest_freq_index]
                         current_node = current_node.parent
                     break
-                # print(current_node.childen_freq)
                 current_node = current_node.childen[index]
-        # print(self.root_node.childen[24].childen_freq)
 
     def autoComplete(self, prompt):
         current_node = self.root_node
@@ -190,7 +185,6 @@ class CatsTrie:
         while current_node.freq == check_freq and current_node.highest_child is not None:
             res_str += current_node.highest_child.char
             current_node = current_node.highest_child
-        print(res_str)
         return res_str
 
 sentences = ["ab", "a"]
