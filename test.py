@@ -257,5 +257,31 @@ class Q1Test(unittest.TestCase):
         # myres = 614
         self.assertEqual(maxThroughput(connections, maxIn, maxOut, origin, targets), 587)
 
+    def test_bidirectional(self):
+        connections = [(0, 1, 3000), (1, 2, 2000), (1, 3, 1000), (2, 1, 2000),
+                       (0, 3, 2000), (3, 4, 2000), (3, 2, 1000)]
+        maxIn = [5000, 3000, 3000, 3000, 2000]
+        maxOut = [5000, 3000, 3000, 2500, 1500]
+        origin = 0
+        targets = [4, 2]
+        self.assertEqual(maxThroughput(connections, maxIn, maxOut, origin, targets), 4500)
+
+    def test(self):
+        connections = [(0, 1, 3000), (1, 2, 2000), (1, 3, 1000),
+                       (0, 3, 2000), (3, 4, 2000), (3, 2, 1000)]
+        maxIn = [5000, 3000, 3000, 2000, 2000]
+        maxOut = [5000, 3000, 3000, 2000, 1500]
+        origin = 0
+        targets = [4, 2]
+        self.assertEqual(maxThroughput(connections, maxIn, maxOut, origin, targets), 4000)
+
+    def test_edge_case(self):
+        connections = [(0, 1, 3000), (1, 2, 2000), (1, 3, 1000), (0, 3, 2000), (3, 4, 2000), (3, 2, 1000)]
+        maxIn = [5000, 3000, 3000, 3000, 2000]
+        maxOut = [5000, 3000, 3000, 2500, 2000]
+        origin = 0
+        targets = [4, 2]
+        self.assertEqual(maxThroughput(connections, maxIn, maxOut, origin, targets), 4500)
+
 if __name__ == "__main__":
     unittest.main()

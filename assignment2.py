@@ -45,7 +45,7 @@ class Edge:
 # index: since each vertex will be break into 2 vertices, the actual vertex index * 2 = vertex(in), actual vertex index * 2 + 1 = vertex(out)
 # connections stores each actual edge capacity, while the maxOut stores the actual capacity a vertex can take
 class Graph:
-    def __init__(self, connections, maxIn, maxOut):
+    def __init__(self, connections, maxIn, maxOut, origin, targets):
         self.length = len(maxIn) * 2
         # self.graph = [[0 for _ in range(self.length)] for _ in range(self.length)]
         self.graph = [[]for _ in range(self.length)]
@@ -58,6 +58,7 @@ class Graph:
 
             reverse_edge = Edge(0, 0, i*2+1, i*2)
             edge.reverse_edge = reverse_edge
+            reverse_edge.reverse_edge = edge
             self.graph[i*2].append(edge)
             self.graph[i*2+1].append(reverse_edge)
 
@@ -68,14 +69,17 @@ class Graph:
             edge = Edge(capacity, 0, start*2+1, end*2)
             reverse_edge = Edge(0, 0, end*2, start*2+1)
             edge.reverse_edge = reverse_edge
+            reverse_edge.reverse_edge = edge
             self.graph[start*2+1].append(edge)
             self.graph[end*2].append(reverse_edge)
 
+        for target in targets:
+            self.graph[target*2][0].capacity = maxIn[target]
+        self.graph[origin*2][0].capacity = maxOut[origin]
 
 def bfs(start:int, num_of_vertex, graph:Graph):
     preq = [None for _ in range(num_of_vertex)]
-    # visited = [False for _ in range(num_of_vertex)]
-    # visited[start] = True
+
     queue = Queue(num_of_vertex)
     queue.push(start)
     while queue.is_empty() == False:
@@ -88,7 +92,7 @@ def bfs(start:int, num_of_vertex, graph:Graph):
 
 def maxThroughput(connections, maxIn, maxOut, origin, targets):
     max_flow = 0
-    processed_graph = Graph(connections,maxIn,maxOut)
+    processed_graph = Graph(connections,maxIn,maxOut, origin, targets)
     able_to_find_path = True
     while able_to_find_path == True:
         able_to_find_path = False
@@ -117,13 +121,15 @@ def maxThroughput(connections, maxIn, maxOut, origin, targets):
 
     return max_flow
 
-connections = [(0, 1, 3000), (1, 2, 2000), (1, 3, 1000),
-(0, 3, 2000), (3, 4, 2000), (3, 2, 1000)]
-maxIn = [5000, 3000, 3000, 3000, 2000]
-maxOut = [5000, 3000, 3000, 2500, 1500]
-origin = 0
-targets = [4, 2]
-# print(maxThroughput(connections,maxIn,maxOut,origin,targets))
+
+# D = 5, C = 6, max_throughput = 15
+# connections = [(2, 4, 4), (4, 0, 11), (2, 1, 5), (4, 3, 8), (1, 0, 7), (3, 2, 9)]
+# maxIn = [2, 15, 12, 13, 3]
+# maxOut = [7, 10, 6, 9, 3]
+# origin = 2
+# targets = [0, 3]
+# print(maxThroughput(connections, maxIn, maxOut, origin, targets))
+# self.assertEqual(maxThroughput(connections, maxIn, maxOut, origin, targets), 5)
 
 
 class Node:
@@ -172,22 +178,23 @@ class CatsTrie:
 
     def autoComplete(self, prompt):
         current_node = self.root_node
-        res_str = ""
+        res = []
         if len(prompt) != 0:
             for char in prompt:
                 index = ord(char) - 96
                 if current_node.childen[index] != None:
-                    res_str += char
+                    res.append(char)
                     current_node = current_node.childen[index]
                 else:
                     return None
         check_freq=current_node.freq
         while current_node.freq == check_freq and current_node.highest_child is not None:
-            res_str += current_node.highest_child.char
+            res.append(current_node.highest_child.char)
             current_node = current_node.highest_child
+        res_str = "".join(res)
         return res_str
 
-sentences = ["ab", "a"]
-trie = CatsTrie(sentences)
-print(trie.autoComplete(""))
+# sentences = ["ab", "a"]
+# trie = CatsTrie(sentences)
+# print(trie.autoComplete(""))
 # self.assertTrue(trie.autoComplete("ab") == "abazacy")
