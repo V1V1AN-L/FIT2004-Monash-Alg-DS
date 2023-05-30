@@ -151,30 +151,23 @@ class CatsTrie:
                     child_node = Node(sentence[i])
                     current_node.childen[index] = child_node
                     child_node.parent = current_node
-
-                if i == len(sentence)-1:
-                    current_node.childen[index].freq += 1
-                    current_node = current_node.childen[index]
-                    if current_node.childen[0] == None:
-                        child_node = Node("")
-                        child_node.freq += 1
-                        child_node.parent = current_node
-                        current_node.childen[0] = child_node
-                    else:
-                        current_node.childen[0].freq += 1
-                    for j in range(len(sentence)+1):
-                        if j == 0:
-                            index = 0
-                        else:
-                            index = ord(sentence[len(sentence)-j])-96
-                        current_node.childen_freq[index] = current_node.childen[index].freq
-                        highest_freq = max(current_node.childen_freq)
-                        current_node.freq = highest_freq
-                        highest_freq_index = current_node.childen_freq.index(highest_freq)
-                        current_node.highest_child = current_node.childen[highest_freq_index]
-                        current_node = current_node.parent
-                    break
                 current_node = current_node.childen[index]
+
+            if current_node.childen[0] == None:
+                end_node = Node("")
+                end_node.parent = current_node
+                current_node.childen[0] = end_node
+            current_node.childen[0].freq += 1
+
+            index = 0
+            for j in range(len(sentence)+1):
+                current_node.childen_freq[index] = current_node.childen[index].freq
+                highest_freq = max(current_node.childen_freq)
+                current_node.freq = highest_freq
+                highest_freq_index = current_node.childen_freq.index(highest_freq)
+                current_node.highest_child = current_node.childen[highest_freq_index]
+                current_node = current_node.parent
+                index = ord(sentence[len(sentence)-j-1]) - 96
 
     def autoComplete(self, prompt):
         current_node = self.root_node
@@ -194,7 +187,7 @@ class CatsTrie:
         res_str = "".join(res)
         return res_str
 
-# sentences = ["ab", "a"]
+# sentences = ["ab", "a", "abc", "abd"]
 # trie = CatsTrie(sentences)
 # print(trie.autoComplete(""))
 # self.assertTrue(trie.autoComplete("ab") == "abazacy")
